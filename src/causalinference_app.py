@@ -2,6 +2,7 @@ import base64
 import datetime
 import io
 import os
+from PIL import Image, ImageDraw
 
 import dash
 from dash.dependencies import Input, Output, State
@@ -13,8 +14,13 @@ from dash import dash_table
 # import dash_table
 
 from did import DiD
+from dotenv import load_dotenv, find_dotenv
 
-import pandas as pd
+# find .env automagically by walking up directories until it's found
+dotenv_path = find_dotenv()
+
+# load up the entries as environment variables
+load_dotenv(dotenv_path)
 
 did = None
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -22,8 +28,9 @@ external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
 PAGE_SIZE = 5
 
-if os.path.isfile('assets/did.png'):
-    os.remove('assets/did.png')
+EMPTY_IMAGE = os.environ.get('EMPTY_IMAGE')
+if os.path.isfile(EMPTY_IMAGE):
+    os.remove(EMPTY_IMAGE)
 
 
 def parse_contents(contents, filename, date):
@@ -140,7 +147,14 @@ def descriptive_stats(value):
             print(dir(model_summary))
             return image
     else:
-        return []
+
+        img = Image.new('RGBA', (100, 100), (255, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+        draw.ellipse((25, 25, 75, 75), fill=(255, 0, 0))
+        empty_image = img.save(EMPTY_IMAGE, 'GIF', transparency=0)
+        with Image.open(EMPTY_IMAGE,) as im:
+            empty_image = im
+        return empty_image
 
 if __name__ == '__main__':
     app.run_server(debug=True)

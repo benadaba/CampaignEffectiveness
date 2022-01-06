@@ -7,19 +7,21 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 import base64
 import io
+import os
 
 
 class DiD:
 
     def __init__(self, dataset=None):
         # self.dataset = dataset
-        self.dataset = self.read_csv_df()
+        self.dataset = dataset
         print(dataset)
 
 
     # #pulling the data
     def read_csv_df(self):
-        self.dataset = pd.read_csv('njmin3.csv')
+        self.dataset = pd.read_csv(os.environ['SAMPLE-FILE'])
+        print(self.dataset)
         return self.dataset
 
     def read_uploaded_data(self, uploaded_data:str=None):
